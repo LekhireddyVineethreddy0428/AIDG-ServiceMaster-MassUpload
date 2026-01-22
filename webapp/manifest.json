@@ -1,0 +1,177 @@
+{
+  "_version": "1.37.0",
+  "sap.app": {
+    "id": "zaidgsmmsup",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.19.5",
+      "toolsId": "616439aa-8288-4958-98c8-2a62565a3232"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/sap/opu/odata/sap/ZP_QU_DG_SMROOT_SB/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/mainService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "dependencies": {
+      "minUI5Version": "1.96.37",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "zaidgsmmsup.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {}
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "async": true,
+        "viewPath": "zaidgsmmsup.view",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "clearControlAggregation": false
+      },
+      "routes": [
+        {
+          "name": "View1",
+          "pattern": ":?query:",
+          "target": [
+            "TargetView1"
+          ]
+        },
+        {
+          "name": "MainPageList",
+          "pattern": "MainPageList",
+          "target": [
+            "TargetMainPageList"
+          ]
+        },
+        {
+          "name": "ExtendMassUpload",
+          "pattern": "ExtendMassUpload",
+          "target": [
+            "TargetExtendMassUpload"
+          ]
+        },
+        {
+          "name": "OverViewPage",
+          "pattern": "OverViewPage/{Reqid}/{req_status}",
+          "target": [
+            "TagretOverViewPage"
+          ]
+        },
+        {
+          "name": "StatusPage",
+          "pattern": "StatusPage/{Reqid}",
+          "target": [
+            "StatusPage"
+          ]
+        }
+      ],
+      "targets": {
+        "TargetView1": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "View1",
+          "viewName": "View1"
+        },
+        "TargetMaterialList": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "MaterialList",
+          "viewName": "MaterialList"
+        },
+        "TargetMainPageList": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "MainPageList",
+          "viewName": "MainPageList"
+        },
+        "TargetExtendMassUpload": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "ExtendMassUpload",
+          "viewName": "ExtendMassUpload"
+        },
+        "TagretOverViewPage": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "OverViewPage",
+          "viewName": "OverViewPage"
+        },
+        "StatusPage": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "StatusPage",
+          "viewName": "StatusPage"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "zaidgsmmsup.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "App"
+    }
+  }
+}

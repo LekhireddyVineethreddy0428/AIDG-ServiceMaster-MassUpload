@@ -1,0 +1,19 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Menu>
+        <MenuItem
+            text="New Mass Upload"
+            icon="sap-icon://upload"
+            press="onUploadpress"
+        />
+        <MenuItem
+            text="Update Mass Upload"
+            icon="sap-icon://detail-more"
+            press="onMassExtendPress"
+        />
+    </Menu>
+</core:FragmentDefinition>
+ 
+ 

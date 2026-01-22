@@ -1,0 +1,65 @@
+<mvc:View controllerName="zaidgsmmsup.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:customData="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    xmlns:f="sap.f">
+    <f:DynamicPage id="dynamicPageId" stickySubheaderProvider="iconTabBar" preserveHeaderStateOnScroll="true" class="sapUiNoContentPadding">
+        <f:title>
+            <f:DynamicPageTitle id="_IDGenDynamicPageTitle">
+                <f:heading>
+                    <Title id="_IDGenTitle" text="Service Master Mass Request Details" width="100%" />
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:header>
+            <f:DynamicPageHeader id="_IDGenDynamicPageHeader1" pinnable="true">
+                <smartFilterBar:SmartFilterBar id="smartFilterBar" entitySet="ZI_QU_DG_SM_MassRqst_REQ" considerAnalyticalParameters="true" showGoOnFB="true" useToolbar="false" persistencyKey="smartFilterPersistentKey" useDateRangeType="true" layoutMode="ResponsiveGridLayout" search="onGoPress" initialized="initialized" enableBasicSearch="true" basicSearchFieldName="Request Id" visible="true">
+                    <smartFilterBar:controlConfiguration>
+                        <smartFilterBar:ControlConfiguration id="_IDGenControlConfiguration1" key="reqid" label="Request Id" visibleInAdvancedArea="true" />
+                        <smartFilterBar:ControlConfiguration id="_IDGenControlConfiguration2" key="reqtyp" label="Request Type" visibleInAdvancedArea="true" />
+                        <smartFilterBar:ControlConfiguration id="_IDGenControlConfiguration3" key="req_status" label="Request Status" visibleInAdvancedArea="true" />
+                    </smartFilterBar:controlConfiguration>
+                </smartFilterBar:SmartFilterBar>
+                <smartFilterBar:SmartFilterBar id="smartFilterBar2" entitySet="ZI_QU_DG_SM_MassRqst_EX" considerAnalyticalParameters="true" showGoOnFB="true" useToolbar="false" persistencyKey="smartFilterPersistentKey" useDateRangeType="true" layoutMode="ResponsiveGridLayout" search="onGoPress" initialized="initialized" enableBasicSearch="true" basicSearchFieldName="" visible="false">
+                    <smartFilterBar:controlConfiguration>
+                        <smartFilterBar:ControlConfiguration id="_IDGenControlConfiguration10" key="object_number" label="Service Matser" visibleInAdvancedArea="true" />
+                        <smartFilterBar:ControlConfiguration id="_IDGenControlConfiguration12" key="reqtyp" label="Request Type" visibleInAdvancedArea="true"/>
+                        <smartFilterBar:ControlConfiguration id="_IDGenControlConfiguration13" key="req_created_by" label="Request Created By" visibleInAdvancedArea="true" />
+                    </smartFilterBar:controlConfiguration>
+                </smartFilterBar:SmartFilterBar>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <IconTabBar class="sapUiResponsiveContentPadding" id="iconTabBar" select="onTabSelect">
+                <items>
+                    <IconTabFilter key="requests" text="Service Requests">
+                        <smartTable:SmartTable id="UserMasterSmartTable" entitySet="ZI_QU_DG_SM_MassRqst_REQ" smartFilterId="smartFilterBar" tableType="ResponsiveTable" beforeExport="onBeforeExport" useVariantManagement="false" useTablePersonalisation="true" header="Service Requests" placeToolbarInTable="true" showRowCount="true" enableAutoColumnWidth="true" enableAutoBinding="true" persistencyKey="SmartFilter_Explored" beforeRebindTable="onBeforeRebindTable" requestAtLeastFields="reqid,reqtyp,req_status,req_desc,reqprio,req_created_by,req_created_on" initiallyVisibleFields="reqid,reqtyp,req_status,req_desc,reqprio,req_created_by,req_created_on">
+                            <smartTable:customToolbar>
+                                <OverflowToolbar id="_IDGenOverflowToolbar1" design="Transparent">
+                                    <ToolbarSpacer id="_IDGenToolbarSpacer" />
+                                    <Button id="idCreate"  text="Mass Upload" icon="sap-icon://write-new" type="Transparent" press="onUploadpress" />
+                                </OverflowToolbar>
+                            </smartTable:customToolbar>
+                        </smartTable:SmartTable>
+                    </IconTabFilter>
+                    <IconTabFilter key="materials" text="Service Masters">
+                        <smartTable:SmartTable id="idSmartTableMaterials" entitySet="ZI_QU_DG_SM_MassRqst_EX" smartFilterId="smartFilterBar2" tableType="ResponsiveTable" enableAutoBinding="true" header="Service Masters" showRowCount="true" placeToolbarInTable="true" enableAutoColumnWidth="true" useVariantManagement="false" persistencyKey="myUniquePersistencyKeyForMaterialTable" showTablePersonalisation="true" initiallyVisibleFields="asnum,reqid,reqtyp,astyp,req_desc,reqprio,req_created_by,req_created_on"
+                            xmlns:smartTable="sap.ui.comp.smarttable"
+                            xmlns:m="sap.m"
+                            xmlns:core="sap.ui.core" useTablePersonalisation="true" beforeRebindTable="onBeforeRebindTableExt">
+                            <smartTable:customToolbar>
+                                <m:OverflowToolbar id="exportd" design="Solid">
+                                    <m:ToolbarSpacer id="_I3DGenToolbarSpacer" />
+                                    <m:Button id="MassUploadExcel" text="Export Excel" type="Transparent" press="onPressExport" icon="sap-icon://excel-attachment" />
+                                </m:OverflowToolbar>
+                            </smartTable:customToolbar>
+                        </smartTable:SmartTable>
+                    </IconTabFilter>
+                </items>
+            </IconTabBar>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>
