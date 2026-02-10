@@ -19,6 +19,16 @@ server:
           - path: /sap
             url: http://airdithanaprd:44388
             destination: s4p_https
+          - url: http://airdithanaprd:44388
+            client: '200'
+            authenticationType: BasicAuthentication
+            destination: s4p_https
+            path: /sap/opu/odata/sap/ZP_QU_DG_WORKITM_RQSTS_SRV/
+          - url: http://airdithanaprd:44388
+            client: '200'
+            authenticationType: BasicAuthentication
+            destination: s4p_https
+            path: /sap/opu/odata/sap/ZC_QU_DG_SM_MASS_SRV/
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:

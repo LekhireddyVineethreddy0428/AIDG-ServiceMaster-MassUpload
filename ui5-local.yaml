@@ -33,6 +33,16 @@ server:
           - path: /sap
             url: http://airdithanaprd:44388
             destination: s4p_https
+          - url: http://airdithanaprd:44388
+            client: '200'
+            authenticationType: BasicAuthentication
+            destination: s4p_https
+            path: /sap/opu/odata/sap/ZP_QU_DG_WORKITM_RQSTS_SRV/
+          - url: http://airdithanaprd:44388
+            client: '200'
+            authenticationType: BasicAuthentication
+            destination: s4p_https
+            path: /sap/opu/odata/sap/ZC_QU_DG_SM_MASS_SRV/
     - name: sap-fe-mockserver
       beforeMiddleware: csp
       configuration:
@@ -42,4 +52,14 @@ server:
             metadataPath: ./webapp/localService/mainService/metadata.xml
             mockdataPath: ./webapp/localService/mainService/data
             generateMockData: true
-        annotations: []
+          - urlPath: /sap/opu/odata/sap/ZP_QU_DG_SMROOT_SB
+            metadataPath: ./webapp/localService/mainService/metadata.xml
+            mockdataPath: ./webapp/localService/mainService/data
+            generateMockData: true
+          - urlPath: /sap/opu/odata/sap/ZP_QU_DG_WORKITM_RQSTS_SRV
+            metadataPath: ./webapp/localService/ZP_QU_DG_WORKITM_RQSTS_SRV/metadata.xml
+            mockdataPath: ./webapp/localService/ZP_QU_DG_WORKITM_RQSTS_SRV/data
+            generateMockData: true
+        annotations:
+          - localPath: ./webapp/localService/ZP_QU_DG_WORKITM_RQSTS_SRV/ZP_QU_DG_WORKITM_RQSTS_SRV_VAN.xml
+            urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZP_QU_DG_WORKITM_RQSTS_SRV_VAN',Version='0001')/$value/

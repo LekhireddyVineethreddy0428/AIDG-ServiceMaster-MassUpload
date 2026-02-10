@@ -21,8 +21,8 @@ sap.ui.define(
             },
             onClickDownloadTemplate: function (oEvent) {
                 const aHeaders = [
-                    "Base UOM", "Short Text", "Material Service Group",
-                    "Division", "Valuation Class", "Long Text"
+                    "Service Category", "Base UOM", "Short Text", "Material Service Group",
+                    "Division", "Valuation Class", "Authorization Group", "Service Type", "Tax indicator", "Deletion Indicator", "Long Text"
                 ];
 
                 const workbook = new ExcelJS.Workbook();
@@ -126,12 +126,12 @@ sap.ui.define(
                         onClose: function (oAction) {
                             if (oAction === sap.m.MessageBox.Action.OK) {
                                 this.getView().setBusy(true);
-                                var oModel = this.getOwnerComponent().getModel("ZQU_DG_MAT_MASS_UPLOAD_SRV");
+                                var oModel = this.getOwnerComponent().getModel("ZC_QU_DG_SM_MASS_SRV");
                                 oModel.read("/MassUploadSet", {
                                     success: function (res) {
                                         this.reqid = res.results[0].reqid;
-                                        this.processMassUpload(this.reqid);
                                         this.getView().byId("idRequest").setText(`Request Id : ${this.reqid}`);
+                                        this.processMassUpload(this.reqid);
                                     }.bind(this),
                                     error: function (err) {
                                         sap.m.MessageBox.error(
@@ -148,38 +148,34 @@ sap.ui.define(
                 );
             },
             processMassUpload: function (reqid) {
-                debugger;
-                let oTable = this.getView().byId("idMtype_table").getItems();
-                let aFileUploader = [];
-                let that = this;
-
-                oTable.forEach((item) => {
-                    aFileUploader.push({
-                        fileUploader: item.getAggregation("cells")[2],
-                        materialType: item.getBindingContext("MaterialType").getObject().mType
-                    });
-                });
+                let aItems = this.getView().byId("idMtype_table").getItems();
+                let oDataModel = this.getView().getModel("ZC_QU_DG_SM_MASS_SRV");
+                let sTokenForUpload = oDataModel.getSecurityToken();
+                let sUrl = oDataModel.sServiceUrl + "/MassUploadSet";
 
                 this.count = 0;
-                aFileUploader.forEach((data) => {
-                    var oDataModel = that.getView().getModel("ZQU_DG_MAT_MASS_UPLOAD_SRV");
-                    var sTokenForUpload = oDataModel.getSecurityToken();
-                    var oHeaderParameter = new sap.ui.unified.FileUploaderParameter({
-                        name: "X-CSRF-Token",
-                        value: sTokenForUpload,
-                    });
-                    var sMaterialType = data.materialType;
-                    var oHeaderSlug = new sap.ui.unified.FileUploaderParameter({
-                        name: "SLUG",
-                        value: `${reqid}|${that.reqprio}|${that.req_desc}|CREATE`,
-                    });
-                    data.fileUploader.removeAllHeaderParameters();
-                    data.fileUploader.addHeaderParameter(oHeaderParameter);
-                    data.fileUploader.addHeaderParameter(oHeaderSlug);
-                    var sUrl = oDataModel.sServiceUrl + "/MassUploadSet";
-                    data.fileUploader.setUploadUrl(sUrl);
-                    data.fileUploader.upload();
-                    this.count++;
+
+                aItems.forEach((oItem) => {
+                    let oFileUploader = oItem.getCells()[2];
+
+                    if (oFileUploader && oFileUploader.getValue()) {
+                        oFileUploader.removeAllHeaderParameters();
+
+                        oFileUploader.addHeaderParameter(new sap.ui.unified.FileUploaderParameter({
+                            name: "X-CSRF-Token",
+                            value: sTokenForUpload
+                        }));
+
+                        oFileUploader.addHeaderParameter(new sap.ui.unified.FileUploaderParameter({
+                            name: "SLUG",
+                            value: `${reqid}|${this.reqprio}|${this.req_desc}|CREATE_MAS`
+                        }));
+
+                        oFileUploader.setUploadUrl(sUrl);
+                        oFileUploader.upload();
+
+                        this.count++;
+                    }
                 });
             },
             handleUploadComplete: function (oEvent) {
@@ -243,7 +239,7 @@ sap.ui.define(
 
             onValueHelpRequested: function () {
                 const oView = this.getView();
-                const oModel = oView.getModel();                            // OData v2 model
+                const oModel = oView.getModel();                            
                 const sEntitySetPath = "/zi_qudg_requstpriority_vh";
 
                 if (!this._oF4HelpDialog) {
@@ -398,6 +394,9 @@ sap.ui.define(
                 if (oTable) {
                 }
             },
+            onPressCancel: function () {
+                window.history.go(-1);
+            }
 
 
 

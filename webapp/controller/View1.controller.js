@@ -29,14 +29,14 @@ sap.ui.define([
                 });
             },
             onExisitingPress: function (oEvent) {
-                var sComponent = "zmaterialcreate.materialcreate";
+                var sComponent = "aidgservicemaster";
                 var oBindingContext = oEvent.getSource().getBindingContext();
-                var matnrNum = oBindingContext.getProperty("Matnr");
-                var sNo = 0;
+                var matnrNum = oBindingContext.getProperty("asnum");
+                let sNo = oBindingContext.getProperty('s_no')
 
                 let oParams = {
                     SNO: sNo,
-                    REQID: "NA",
+                    REQID: "",
                     MATNR: matnrNum,
                     ISACTIVEENTITY: true
                 }
@@ -45,9 +45,38 @@ sap.ui.define([
             },
 
             onBeforeRebindTable: function (oEvent) {
-                const oBindingParams = oEvent.getParameter("bindingParams");
-                oBindingParams.sorter.push(new sap.ui.model.Sorter("req_created_on", true));
+                let oBindingParams = oEvent.getParameter("bindingParams");
+                let oTable = oEvent.getSource().getTable();
+
+                oBindingParams.sorter.push(
+                    new sap.ui.model.Sorter("req_created_on", true)
+                );
+
+                oBindingParams.events = {
+                    dataReceived: function () {
+                        let aItems = oTable.getItems();
+                        aItems.forEach((oItem) => {
+                            oItem.setType("Navigation");
+                            oItem.attachPress(this.onItemPress, this);
+                        });
+                    }.bind(this)
+                };
             },
+            onBeforeRebindTableExt: function (oEvent) {
+                let oBindingParams = oEvent.getParameter("bindingParams");
+                let oTable = oEvent.getSource().getTable();
+                 oBindingParams.events = {
+                    dataReceived: function () {
+                        let aItems = oTable.getItems();
+                        aItems.forEach((oItem) => {
+                            oItem.setType("Navigation");
+                            oItem.attachPress(this.onExisitingPress, this);
+                        });
+                    }.bind(this)
+                };
+
+            },
+
 
             onTabSelect: function (oEvent) {
                 const sSelectedKey = oEvent.getParameter("key");

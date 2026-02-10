@@ -39,11 +39,11 @@
                         </Column>
                     </columns>
                     <items>
-                        <ColumnListItem type="Active" press="onGetid">
+                        <ColumnListItem type="Active">
                             <cells>
                                 <ObjectIdentifier title="Service Matser" />
                                 <Button type="Emphasized" press="onClickDownloadTemplate" icon="sap-icon://download" />
-                                <u:FileUploader id="uploadedDoc" fileType="xlsx" sendXHR="true" name="myFileUpload" buttonText="Browse" useMultipart="false" placeholder="Choose a file..." tooltip="Upload your file to the local server" uploadComplete="handleUploadComplete" />
+                                <u:FileUploader id="uploadedDoc" fileType="xlsx" sendXHR="true" buttonText="Browse" useMultipart="false" placeholder="No file chosen" style="Emphasized" change="onFileChange" uploadComplete="handleUploadComplete" width="100%"/>
                             </cells>
                         </ColumnListItem>
                     </items>

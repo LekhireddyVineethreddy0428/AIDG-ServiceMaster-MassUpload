@@ -1,0 +1,42 @@
+<core:FragmentDefinition
+    xmlns="sap.ui.comp.valuehelpdialog"
+    xmlns:m="sap.m"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core">
+    <ValueHelpDialog
+        title="Request Priority"
+        ok=".onValueHelpOk"
+        cancel=".onValueHelpCancel"
+        afterClose=".onValueHelpAfterClose"
+        supportRanges="true"
+        key="domvalue_l"
+        descriptionKey="Ddtext"
+        contentHeight="600px"
+        contentWidth="850px"
+        >
+        <filterBar>
+            <fb:FilterBar advancedMode="true" search=".onFilterBarSearch" isRunningInValueHelpDialog="true">
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        groupName="__$INTERNAL$"
+                        name="RequestPriority"
+                        label="Request Priority"
+                        visibleInFilterBar="true">
+                        <fb:control>
+                            <m:Input name="Request Priority" />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        groupName="__$INTERNAL$"
+                        name="Description"
+                        label="Description"
+                        visibleInFilterBar="true">
+                        <fb:control>
+                            <m:Input name="ProductName" />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+        </filterBar>
+    </ValueHelpDialog>
+</core:FragmentDefinition>

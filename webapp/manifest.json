@@ -24,6 +24,33 @@
           "localUri": "localService/mainService/metadata.xml",
           "odataVersion": "2.0"
         }
+      },
+      "ZP_QU_DG_WORKITM_RQSTS_SRV_VAN": {
+        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZP_QU_DG_WORKITM_RQSTS_SRV_VAN',Version='0001')/$value/",
+        "type": "ODataAnnotation",
+        "settings": {
+          "localUri": "localService/ZP_QU_DG_WORKITM_RQSTS_SRV/ZP_QU_DG_WORKITM_RQSTS_SRV_VAN.xml"
+        }
+      },
+      "ZP_QU_DG_WORKITM_RQSTS_SRV": {
+        "uri": "/sap/opu/odata/sap/ZP_QU_DG_WORKITM_RQSTS_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [
+            "ZP_QU_DG_WORKITM_RQSTS_SRV_VAN"
+          ],
+          "localUri": "localService/ZP_QU_DG_WORKITM_RQSTS_SRV/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "ZC_QU_DG_SM_MASS_SRV": {
+        "uri": "/sap/opu/odata/sap/ZC_QU_DG_SM_MASS_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/ZC_QU_DG_SM_MASS_SRV/metadata.xml",
+          "odataVersion": "2.0"
+        }
       }
     }
   },
@@ -64,6 +91,16 @@
       },
       "": {
         "dataSource": "mainService",
+        "preload": true,
+        "settings": {}
+      },
+      "ZP_QU_DG_WORKITM_RQSTS_SRV": {
+        "dataSource": "ZP_QU_DG_WORKITM_RQSTS_SRV",
+        "preload": true,
+        "settings": {}
+      },
+      "ZC_QU_DG_SM_MASS_SRV": {
+        "dataSource": "ZC_QU_DG_SM_MASS_SRV",
         "preload": true,
         "settings": {}
       }

@@ -43,19 +43,22 @@
                                     <Button id="idCreate"  text="Mass Upload" icon="sap-icon://write-new" type="Transparent" press="onUploadpress" />
                                 </OverflowToolbar>
                             </smartTable:customToolbar>
+                            <Table sticky="ColumnHeaders,HeaderToolbar,InfoToolbar" />
                         </smartTable:SmartTable>
                     </IconTabFilter>
-                    <IconTabFilter key="materials" text="Service Masters">
-                        <smartTable:SmartTable id="idSmartTableMaterials" entitySet="ZI_QU_DG_SM_MassRqst_EX" smartFilterId="smartFilterBar2" tableType="ResponsiveTable" enableAutoBinding="true" header="Service Masters" showRowCount="true" placeToolbarInTable="true" enableAutoColumnWidth="true" useVariantManagement="false" persistencyKey="myUniquePersistencyKeyForMaterialTable" showTablePersonalisation="true" initiallyVisibleFields="asnum,reqid,reqtyp,astyp,req_desc,reqprio,req_created_by,req_created_on"
+                    <IconTabFilter key="materials" text="Service Masters" >
+                        <smartTable:SmartTable id="idSmartTableMaterials" entitySet="ZI_QU_DG_SM_MassRqst_EX" smartFilterId="smartFilterBar2" tableType="ResponsiveTable" enableAutoBinding="true" header="Service Masters" showRowCount="true" placeToolbarInTable="true" enableAutoColumnWidth="true" useVariantManagement="false" persistencyKey="myUniquePersistencyKeyForMaterialTable" showTablePersonalisation="true"  initiallyVisibleFields="asnum,reqtyp,astyp,req_desc,reqprio,req_created_by,req_created_on" 
                             xmlns:smartTable="sap.ui.comp.smarttable"
                             xmlns:m="sap.m"
-                            xmlns:core="sap.ui.core" useTablePersonalisation="true" beforeRebindTable="onBeforeRebindTableExt">
+                            xmlns:core="sap.ui.core" useTablePersonalisation="true"  beforeRebindTable="onBeforeRebindTableExt"  >
+                            
                             <smartTable:customToolbar>
                                 <m:OverflowToolbar id="exportd" design="Solid">
                                     <m:ToolbarSpacer id="_I3DGenToolbarSpacer" />
                                     <m:Button id="MassUploadExcel" text="Export Excel" type="Transparent" press="onPressExport" icon="sap-icon://excel-attachment" />
                                 </m:OverflowToolbar>
                             </smartTable:customToolbar>
+                            <m:Table sticky="ColumnHeaders,HeaderToolbar,InfoToolbar" />
                         </smartTable:SmartTable>
                     </IconTabFilter>
                 </items>

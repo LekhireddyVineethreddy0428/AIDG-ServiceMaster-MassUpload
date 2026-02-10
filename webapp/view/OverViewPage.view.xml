@@ -1,0 +1,82 @@
+<mvc:View height="100%" controllerName="zaidgsmmsup.controller.OverViewPage"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:card="sap.f.cards"
+    xmlns:chart="sap.suite.ui.commons"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:layout="sap.ui.layout"
+    xmlns:smartchart="sap.ui.comp.smartchart">
+    <f:DynamicPage id="dynamicPage1" stickySubheaderProvider="ShoppingCartWizard" class="sapUiNoContentPadding" showFooter="true">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="Service Master Mass Upload" />
+                </f:heading>
+                <f:expandedContent>
+                    <Title id="idRequest" text="" />
+                </f:expandedContent>
+
+                <f:content>
+                    <OverflowToolbar>
+                        <GenericTag text="Total" status="None" design="StatusIconHidden" class="sapUiMediumMarginBegin" visible="{graphStatsModel>/visible}">
+                            <ObjectNumber number="{graphStatsModel>/totalCount}" emphasized="false" state="None" />
+                        </GenericTag>
+
+                        <GenericTag text="Errors" status="Error" design="StatusIconHidden" class="sapUiMediumMarginBegin" visible="{graphStatsModel>/visible}">
+                            <ObjectNumber number="{graphStatsModel>/errorCount}" emphasized="false" state="Error" />
+                        </GenericTag>
+
+                        <GenericTag text="Without Errors" status="Success" design="StatusIconHidden" class="sapUiMediumMarginBegin" visible="{graphStatsModel>/visible}">
+                            <ObjectNumber number="{graphStatsModel>/noErrorCount}" emphasized="false" state="Success" />
+                        </GenericTag>
+                    </OverflowToolbar>
+                </f:content>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:header>
+        </f:header>
+        <f:content>
+            <HBox fitContainer="true" class="sapUiMediumMargin">
+                <VBox width="28%" height="50vh" class="sapUiSmallMarginEnd" fitContainer="false">
+                    <smartchart:SmartChart class="sapUiMediumMarginEnd" id="smartErrorChart" enableAutoBinding="true" beforeRebindChart="onBeforeRebindChart" entitySet="ZI_QU_DG_SM_Errorcount" header="Results" showFullScreenButton="false" selectionMode="Single" showChartTooltip="true" showDrillBreadcrumbs="false" showDetailsButton="false" showDrillButtons="false" height="40vh" showLegendButton="false" requestAtLeastFields="Errors,Without_Errors" useChartPersonalisation="false" showZoomButtons="false" showChartTypeSelectionButton="false" showSemanticNavigationButton="false">
+                        <smartchart:customData>
+                            <core:CustomData key="Without_Errors" value="Without Errors" />
+                        </smartchart:customData>
+                    </smartchart:SmartChart>
+                </VBox>
+                <VBox width="70%" fitContainer="true">
+                    <ScrollContainer height="50vh" width="auto" horizontal="false" vertical="true">
+                        <smartTable:SmartTable id="smartErrorTable" entitySet="ZP_QU_DG_SMROOT" tableType="ResponsiveTable" header="Service Masters" showRowCount="true" enableAutoBinding="true" showTablePersonalisation="true" requestAtLeastFields="s_no,IsActiveEntity" fitContainer="true" useInfoToolbar="Auto" enableExport="false" useTablePersonalisation="true" demandPopin="true" useVariantManagement="true" placeToolbarInTable="true" enableAutoColumnWidth="true" height="50vh" beforeRebindTable="onBeforeRebindTable">
+                            <smartTable:customToolbar>
+                                <OverflowToolbar id="_IDGenOverflowToolbar12" design="Transparent">
+                                    <ToolbarSpacer />
+                                    <SearchField width="50%" change="onLiveChange" id="liveSearchFilter" />
+                                    <ToolbarSpacer />
+                                    <Button icon="sap-icon://excel-attachment" text=" Export All Errors" press="OnPressErrorExcel" />
+                                </OverflowToolbar>
+                            </smartTable:customToolbar>
+                        </smartTable:SmartTable>
+                    </ScrollContainer>
+                </VBox>
+            </HBox>
+        </f:content>
+        <f:footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <ToolbarSpacer />
+                <Button text="Show Logs" press="onShowLog" type="Emphasized" visible="false" id="logsButton" />
+                <Button text="Show Status" press="onShowStatus" type="Emphasized" visible="false" id="statusButton" />
+                <Button text="Proceed" press="onPressProceedWihoutError" type="Emphasized" visible="{graphStatsModel>/proceed}" id="proceedButton" />
+                <Button text="Cancel" press="onPressCancel" type="Emphasized" visible="true" />
+                <Button text="Proceed Without Errors" press="onPressProceedWihoutError" type="Emphasized" visible="{graphStatsModel>/proceedWithoutError}" />
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
+</mvc:View>
