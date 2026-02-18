@@ -11,10 +11,10 @@ sap.ui.define(
   function (Controller, JSONModel, MessageToast, MessageBox, Filter, FilterOperator, Fragment) {
     "use strict";
 
-    return Controller.extend("zaidgsmmsup.controller.OverViewPage", {
+    return Controller.extend("zaidgsmmsup.controller.StatusPage", {
       onInit: function () {
         //Navigating from the list item press
-        this.getOwnerComponent().getRouter().getRoute("OverViewPage").attachPatternMatched(this._onRouteMatched, this);
+        this.getOwnerComponent().getRouter().getRoute("StatusPage").attachPatternMatched(this._onRouteMatched, this);
         this._rebindDebounceTimer = null;
         this.REBIND_DEBOUNCE_TIME = 800;
 
@@ -579,8 +579,8 @@ sap.ui.define(
               let oPayload = {
                 s_no: 1,
                 reqid: that.reqid,
-                asnum: that.asnum,
-                IsActiveEntity: that.activeEnity,
+                asnum: '',
+                IsActiveEntity: true,
                 WiId: that.WorkItem_ID,
                 Step: ''
               };
@@ -623,12 +623,197 @@ sap.ui.define(
 
         });
       },
+      onApprove: function () {
+        debugger;
+        let that = this;
+        let oModel = this.getOwnerComponent().getModel();
+
+        const oParams = {
+          s_no: 1,
+          reqid: that.reqid,
+          asnum: '',
+          IsActiveEntity: true,
+          WiId: that.WorkItem_ID,
+          Step: ''
+        };
+
+        oModel.callFunction("/approve", {
+          method: "POST",
+          urlParameters: oParams,
+          success: (oData, response) => {
+
+            let successMessage = "Request Approved";
+            if (oData && oData.__metadata && oData.__metadata['sap-message']) {
+              const sapMessage = JSON.parse(oData.__metadata['sap-message']);
+              if (sapMessage && sapMessage.message) {
+                successMessage = sapMessage.message;
+              }
+            } else if (response && response.headers && response.headers['sap-message']) {
+              const sapMessage = JSON.parse(response.headers['sap-message']);
+              if (sapMessage && sapMessage.message) {
+                successMessage = sapMessage.message;
+              }
+            }
+
+            sap.m.MessageBox.show(successMessage, {
+              icon: sap.m.MessageBox.Icon.SUCCESS,
+              title: "Success",
+              actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+              emphasizedAction: sap.m.MessageBox.Action.OK,
+              onClose: function (oAction) {
+                if (oAction === sap.m.MessageBox.Action.OK) {
+                  window.history.go(-1);
+                }
+              }
+            });
+          },
+          error: (oError) => {
+            sap.m.MessageToast.show("Approval failed");
+            console.error("Approve error", oError);
+          }
+        });
+      },
+      onReject: function (oEvent) {
+        sap.ui.core.BusyIndicator.show(0)
+        var oModel = this.getOwnerComponent().getModel("ZP_QU_DG_MYTASK_BND")
+        let sequence = this._Sequence
+        let reqid = this.reqid;
+
+        oModel.read(`/ZI_QU_DG_RejctionVH(iv_reqid='${reqid}',iv_sequence='${sequence}')/Set`, {
+          success: function (oData) {
+            let oJsonModel = new sap.ui.model.json.JSONModel(oData.results)
+            this.getView().setModel(oJsonModel, "oRejModel")
+            if (!this._rejectDialog) {
+              this.loadFragment({
+                name: "zaidgsmmsup.fragments.Reject"
+              }).then(function (oDialog) {
+                this._rejectDialog = oDialog;
+                this._rejectDialog.open();
+                sap.ui.core.BusyIndicator.hide()
+              }.bind(this));
+            } else {
+              // Re-open the dialog if it already exists
+              this._rejectDialog.open();
+              sap.ui.core.BusyIndicator.hide()
+            }
+          }.bind(this),
+          error: function (oErr) {
+            sap.ui.core.BusyIndicator.hide()
+          }
+        })
+      },
+
+      onCancel: function () {
+        if (this._rejectDialog) {
+          this._rejectDialog.close();
+          this._rejectDialog.destroy();
+          this._rejectDialog = null;
+        }
+      },
+
+      onConfirmReject: async function (oEvent) {
+        debugger;
+
+        const oCommentInput = this.getView().byId("idRejectComment");
+        const oComboBox = this.getView().byId("idrejectip");
+        const that = this;
+
+        if (oCommentInput.getValue() && oComboBox.getSelectedKey()) {
+          try {
+            this._rejectDialog.setBusy(true);
+
+            const sRejectionComment = oCommentInput.getValue();
+            const rejectInputValue = oComboBox.getSelectedKey();
+
+            const topLevelWiId = this._TopLevelWiid;
+
+            // ✅ Correct callFunction for POST Function Import
+            const oResponse = await new Promise((resolve, reject) => {
+              const oParams = {
+                s_no: 1,
+                reqid: that.reqid,
+                asnum: '',
+                IsActiveEntity: true,
+                WiId: that.WorkItem_ID,
+                Step: rejectInputValue
+              };
+
+              const oModel = that.getOwnerComponent().getModel();
+              oModel.callFunction("/reject", {
+                method: "POST",
+                urlParameters: oParams,
+                success: resolve,
+                error: reject
+              });
+            });
+
+            // ✅ Close and destroy dialog safely
+            if (this._rejectDialog) {
+              this._rejectDialog.close();
+              this._rejectDialog.destroy();
+              this._rejectDialog = null;
+            }
+
+            // ✅ Add rejection comment
+            const oContext = oEvent.getSource().getBindingContext();
+            const sLoggedInUser = oContext?.getObject()?.user_name || "";
+            const oCommentModel = this.getOwnerComponent().getModel("ZQU_DG_ATTACHMENT_COMMENT_SRV");
+            const oPayload = {
+              InstanceId: topLevelWiId,
+              Id: "",
+              Filename: "USER COMMENTS",
+              Text: sRejectionComment,
+              CreatedAt: new Date(),
+              CreatedBy: sLoggedInUser
+            };
+
+            await new Promise((resolve, reject) => {
+              oCommentModel.create(`/TaskSet('${topLevelWiId}')/TaskToComments`, oPayload, {
+                success: resolve,
+                error: reject
+              });
+            });
+
+            // ✅ Handle success message from OData
+            let rejectMessage = "Rejection successful.";
+            if (oResponse && oResponse.headers && oResponse.headers["sap-message"]) {
+              try {
+                const sapMsg = JSON.parse(oResponse.headers["sap-message"]);
+                if (sapMsg.message) rejectMessage = sapMsg.message;
+              } catch (e) {
+                console.log("SAP message parse failed:", e);
+              }
+            }
+
+            sap.m.MessageBox.success(rejectMessage, {
+              onClose: function () {
+                window.history.go(-1);
+              }
+            });
+
+          } catch (oError) {
+            sap.m.MessageToast.show("Rejection failed, please try again.");
+            console.log("Error:", oError);
+          } finally {
+            this._rejectDialog.setBusy(false);
+          }
+
+        } else {
+          // Validation
+          if (!oCommentInput.getValue()) {
+            oCommentInput.setValueState("Error");
+            oCommentInput.setValueStateText("Please add a comment to proceed...!!!");
+          }
+          if (!oComboBox.getSelectedKey()) {
+            oComboBox.setValueState("Error");
+            oComboBox.setValueStateText("Please select a rejection reason.");
+          }
+        }
+      },
 
 
       onPressCancel: function () {
-        // Navigate to the main page
-        const oRouter = this.getOwnerComponent().getRouter();
-        oRouter.navTo("View1");
+        window.history.go(-1);
       },
 
       OnPressErrorExcel: function () {

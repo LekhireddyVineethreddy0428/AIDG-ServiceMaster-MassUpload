@@ -1,4 +1,4 @@
-<mvc:View height="100%" controllerName="zaidgsmmsup.controller.OverViewPage"
+<mvc:View height="100%" controllerName="zaidgsmmsup.controller.StatusPage"
     xmlns:form="sap.ui.layout.form"
     xmlns:core="sap.ui.core"
     xmlns:u="sap.ui.unified"
@@ -13,11 +13,11 @@
     xmlns:smartTable="sap.ui.comp.smarttable"
     xmlns:layout="sap.ui.layout"
     xmlns:smartchart="sap.ui.comp.smartchart">
-    <f:DynamicPage id="dynamicPage1" stickySubheaderProvider="ShoppingCartWizard" class="sapUiNoContentPadding" showFooter="true">
+    <f:DynamicPage id="dynamicPage3" stickySubheaderProvider="ShoppingCartWizard" class="sapUiNoContentPadding" showFooter="true">
         <f:title>
             <f:DynamicPageTitle>
                 <f:heading>
-                    <Title text="Service Master Mass Upload" />
+                    <Title text="Material Mass Upload" />
                 </f:heading>
                 <f:expandedContent>
                     <Title id="idRequest" text="" />
@@ -40,7 +40,6 @@
                 </f:content>
             </f:DynamicPageTitle>
         </f:title>
-        <f:header />
         <f:content>
             <VBox class="FreeBackground" alignContent="Center" justifyContent="Center" height="100%" backgroundDesign="Solid">
                 <VBox alignContent="Center" justifyContent="Center" height="100%" backgroundDesign="Solid">
@@ -100,12 +99,12 @@
                     <OverflowToolbar>
                         <ToolbarSpacer />
                         <ToolbarSpacer />
-                        <Button text="Show Logs" press="onShowLog" type="Emphasized" visible="{controllModel>/ShowLogBtn}" id="logsButton" />
-                        <Button text="Show Status" press="onShowStatus" type="Emphasized" visible="{controllModel>/ShowLogBtn}" id="statusButton" />
-                        <Button text="Withdraw" press="onWithdraw" type="Emphasized" visible="{controllModel>/WithdrawBtn}" id="WithdrawButton" />
-                        <Button text="Proceed" press="onPressProceedWihoutError" type="Emphasized" visible="{controllModel>/ProceedBtn}" id="proceedButton" />
-                        <Button text="Proceed Without Errors" press="onPressProceedWihoutError" type="Emphasized" visible="{controllModel>/ProceedWoErrorBtn}" />
-                        <Button text="Cancel" press="onPressCancel" type="Emphasized" visible="true" />
+                        <Button text="Withdraw" press="onWithdraw" type="Transparent" visible="{controllModel>/WithdrawBtn}" />
+                        <Button text="Approve" press="onApprove" type="Transparent" />
+                        <Button text="Reject" press="onReject" type="Transparent"/>
+                        <Button text="Show Logs" press="onShowLog" type="Transparent" />
+                        <Button text="Show Status" press="onShowStatus" type="Transparent"/>
+                        <Button text="Cancel" press="onPressCancel" type="Transparent" visible="true" />
                     </OverflowToolbar>
                 </f:footer>
             </f:DynamicPage>

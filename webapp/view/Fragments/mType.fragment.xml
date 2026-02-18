@@ -1,0 +1,9 @@
+ <core:FragmentDefinition xmlns='sap.m' xmlns:core='sap.ui.core'>
+    <Dialog id="dialogbox1" title="First" contentHeight="50%" contentWidth="30rem">
+            <VBox id='firstContent'></VBox>
+            <endButton>
+                <Button id="Closed" text="close" type="Reject" press="onCloseDialog"></Button>
+            </endButton>
+    </Dialog>
+
+</core:FragmentDefinition> 

@@ -9,7 +9,7 @@
             press="onUploadpress"
         />
         <MenuItem
-            text="Update Mass Upload"
+            text="Extend Mass Upload"
             icon="sap-icon://detail-more"
             press="onMassExtendPress"
         />
