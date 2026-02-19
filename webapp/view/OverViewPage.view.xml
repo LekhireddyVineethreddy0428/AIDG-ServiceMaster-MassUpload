@@ -50,7 +50,7 @@
                         </VBox>
                         <VBox width="70%" backgroundDesign="Transparent">
                             <ScrollContainer height="50vh" width="auto" horizontal="false" vertical="true">
-                                <smartTable:SmartTable id="smartErrorTable" entitySet="ZP_QU_DG_SMROOT" tableType="ResponsiveTable" header="Service Materials" showRowCount="true" enableAutoBinding="true" beforeRebindTable="onBeforeRebindTable" showTablePersonalisation="true" fitContainer="true" useInfoToolbar="Auto" enableExport="true" beforeExport="onBeforeExportExcel" useTablePersonalisation="true" demandPopin="true" useVariantManagement="true" placeToolbarInTable="true" enableAutoColumnWidth="true" height="50vh">
+                                <smartTable:SmartTable id="smartErrorTable" entitySet="ZP_QU_DG_SMROOT" tableType="ResponsiveTable" header="Service Materials" showRowCount="true" enableAutoBinding="true" beforeRebindTable="onBeforeRebindTable" showTablePersonalisation="true" fitContainer="true" useInfoToolbar="Auto" enableExport="true" beforeExport="onBeforeExportExcel" useTablePersonalisation="true" demandPopin="true" useVariantManagement="true" placeToolbarInTable="true" enableAutoColumnWidth="true" height="50vh" requestAtLeastFields="mass_upld_error,asnum,meins,astyp,asktx,IsActiveEntity,s_no">
                                     <smartTable:customToolbar>
                                         <OverflowToolbar id="_IDGenOverflowToolbar12" design="Transparent">
                                             <ToolbarSpacer />

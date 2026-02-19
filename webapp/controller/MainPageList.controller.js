@@ -193,7 +193,7 @@ sap.ui.define(
                     const oRouter = this.getOwnerComponent().getRouter();
                     oRouter.navTo("OverViewPage", {
                         Reqid: this.reqid,
-                        req_status: "Process not Started"
+                        req_status: "Process Not Started" 
                     });
                     // Clear inputs
                     oDescriptionInput.setValue("");

@@ -50,8 +50,6 @@ sap.ui.define(
           this.getView().byId("onErrorButton").setVisible(false);
         }
         this.getView().byId("idRequest").setText(`Request Id : ${this.reqid}`);
-        this.getView().byId("smartErrorChart").rebindChart();
-        this.getView().byId("smartErrorTable").rebindTable();
         let oModel = this.getView().getModel();
         oModel.read("/ZP_QU_DG_SMROOT", {
           filters: [new sap.ui.model.Filter("reqid", "EQ", this.reqid)],
@@ -126,6 +124,8 @@ sap.ui.define(
               chart.attachDeselectData(this.onDeselectChart, this);
             });
           });
+          this.getView().byId("smartErrorChart").rebindChart();
+          this.getView().byId("smartErrorTable").rebindTable();
 
         }
 
@@ -368,17 +368,28 @@ sap.ui.define(
         this.duplicateFragment.close();
       },
       onIgnoreDuplicates: function () {
-        let sPath = this.getView().getBindingContext();
-        let oModelData = this.getView().getModel();
-        if (oModelData.getProperty(sPath + "/dupindicator") === false) {
-          oModelData.setProperty(sPath + "/dupindicator", true);
-          sap.m.MessageToast.show("Potential duplicates Ignored");
-        }
-        else {
-          oModelData.setProperty(sPath + "/dupindicator", false);
-          sap.m.MessageToast.show("Potential duplicates will be checked");
-        }
-        this.duplicateFragment.close();
+        let oModel = this.getOwnerComponent().getModel();
+        let oData = this.getView().getModel("currentRecord").getData();
+        var mParameters = {
+          s_no: 1,
+          reqid: this.reqid,
+          asnum: oData[0].asnum,
+          IsActiveEntity: true
+        };
+
+        oModel.callFunction("/ignore_duplicate", {
+          method: "POST",
+          urlParameters: mParameters,
+          success: function (oData, response) {
+            MessageToast.show("Potential Duplicates has been ignored");
+            this._ReadErrorData();
+            this.duplicateFragment.close();
+          }.bind(this),
+          error: function (oError) {
+            MessageToast.show("Error calling function import", oError);
+            this.duplicateFragment.close();
+          }.bind(this),
+        });
       },
       findDuplicatesBySNoAndMatnr: function (arr) {
         // debugger;
@@ -504,7 +515,7 @@ sap.ui.define(
           debugger;
           // console.log("clicked");
           const oModel = this.getOwnerComponent().getModel();
-          const firstValidRecord = this._UploadedData.find(item => item.IsError === false);
+          const firstValidRecord = this._UploadedData.find(item => item.mass_upld_error === false);
           if (!firstValidRecord) {
             MessageToast.show("No Valid Records found to proceed..!!!");
             return;

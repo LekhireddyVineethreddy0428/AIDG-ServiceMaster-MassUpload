@@ -45,6 +45,15 @@
                     "odataVersion": "2.0"
                 }
             },
+            "ZQU_DG_WF_GETLOG_SRV_01": {
+                "uri": "/sap/opu/odata/sap/ZQU_DG_WF_GETLOG_SRV_01",
+                "type": "OData",
+                "settings": {
+                    "annotations": [],
+                    "localUri": "localService/ZQU_DG_WF_GETLOG_SRV_01/metadata.xml",
+                    "odataVersion": "2.0"
+                }
+            },
             "ZC_QU_DG_SM_MASS_SRV": {
                 "uri": "/sap/opu/odata/sap/ZC_QU_DG_SM_MASS_SRV/",
                 "type": "OData",
@@ -107,10 +116,25 @@
                 "preload": true,
                 "settings": {}
             },
+            "WorkFlowModel": {
+                "dataSource": "ZQU_DG_WF_GETLOG_SRV_01",
+                "preload": true,
+                "settings": {
+                    "defaultBindingMode": "TwoWay",
+                    "defaultCountMode": "Inline",
+                    "refreshAfterChange": false,
+                    "metadataUrlParams": {
+                        "sap-value-list": "none"
+                    }
+                }
+            },
             "ZC_QU_DG_SM_MASS_SRV": {
                 "dataSource": "ZC_QU_DG_SM_MASS_SRV",
                 "preload": true,
                 "settings": {}
+            },
+            "BatchModel": {
+                "type": "sap.ui.model.json.JSONModel"
             }
         },
         "resources": {

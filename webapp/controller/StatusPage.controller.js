@@ -634,7 +634,8 @@ sap.ui.define(
           asnum: '',
           IsActiveEntity: true,
           WiId: that.WorkItem_ID,
-          Step: ''
+          Step: '',
+          IsAllApprove: false
         };
 
         oModel.callFunction("/approve", {
@@ -669,7 +670,7 @@ sap.ui.define(
           },
           error: (oError) => {
             sap.m.MessageToast.show("Approval failed");
-            console.error("Approve error", oError);
+            console.log("Approve error", oError);
           }
         });
       },
