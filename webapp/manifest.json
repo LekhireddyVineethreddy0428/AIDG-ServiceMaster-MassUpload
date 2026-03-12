@@ -62,6 +62,22 @@
                     "odataVersion": "2.0"
                 }
             },
+            "ZQU_DG_ATTACHMENT_COMMENT_SRV": {
+                "uri": "/sap/opu/odata/sap/ZQU_DG_ATTACHMENT_COMMENT_SRV/",
+                "type": "OData",
+                "settings": {
+                    "localUri": "localService/ZQU_DG_ATTACHMENT_COMMENT_SRV/metadata.xml",
+                    "odataVersion": "2.0"
+                }
+            },
+            "CV_ATTACHMENT_SRV": {
+                "uri": "/sap/opu/odata/sap/CV_ATTACHMENT_SRV/",
+                "type": "OData",
+                "settings": {
+                    "localUri": "localService/CV_ATTACHMENT_SRV/metadata.xml",
+                    "odataVersion": "2.0"
+                }
+            },
             "annotation0": {
                 "type": "ODataAnnotation",
                 "uri": "annotations/annotation0.xml",
@@ -118,6 +134,30 @@
             },
             "WorkFlowModel": {
                 "dataSource": "ZQU_DG_WF_GETLOG_SRV_01",
+                "preload": true,
+                "settings": {
+                    "defaultBindingMode": "TwoWay",
+                    "defaultCountMode": "Inline",
+                    "refreshAfterChange": false,
+                    "metadataUrlParams": {
+                        "sap-value-list": "none"
+                    }
+                }
+            },
+            "ZQU_DG_ATTACHMENT_COMMENT_SRV": {
+                "dataSource": "ZQU_DG_ATTACHMENT_COMMENT_SRV",
+                "preload": true,
+                "settings": {
+                    "defaultBindingMode": "TwoWay",
+                    "defaultCountMode": "Inline",
+                    "refreshAfterChange": false,
+                    "metadataUrlParams": {
+                        "sap-value-list": "none"
+                    }
+                }
+            },
+             "CV_ATTACHMENT_SRV": {
+                "dataSource": "CV_ATTACHMENT_SRV",
                 "preload": true,
                 "settings": {
                     "defaultBindingMode": "TwoWay",

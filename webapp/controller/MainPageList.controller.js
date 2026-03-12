@@ -26,7 +26,7 @@ sap.ui.define(
                 ];
 
                 const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet("Material Template");
+                const worksheet = workbook.addWorksheet("Service Master Template");
 
                 worksheet.columns = aHeaders.map(header => ({
                     header: header,
@@ -80,7 +80,7 @@ sap.ui.define(
                     const url = URL.createObjectURL(blob);
 
                     link.href = url;
-                    link.download = "Material_Mass_Upload_Template.xlsx";
+                    link.download = "Service Master Mass Upload Template.xlsx";
                     document.body.appendChild(link);
                     link.click();
 

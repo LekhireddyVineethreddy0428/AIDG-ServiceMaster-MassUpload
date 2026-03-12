@@ -1,0 +1,22 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core"
+	xmlns="sap.m">
+
+	<Dialog id="commentsDialog" title="Comments" contentWidth="75%" contentHeight="30%" resizable="true" draggable="true" busyIndicatorDelay="0">
+
+		<content >
+			<VBox width="98%" class="sapUiSmallMargin">
+				<FeedInput id="_IDGenFeedInput1" post="onPost" icon="" class="sapUiSmallMarginTopBottom" />
+				<List id="_IDGenList1" showSeparators="Inner" items="{localCommentModel>/EntryCollection}" noDataText="No comments yet.">
+					<FeedListItem sender="{localCommentModel>CreatedBy}" icon="" timestamp="{path:'localCommentModel>CreatedAt', formatter:'dateFormatterForComments'}" text="{localCommentModel>Text}" convertLinksToAnchorTags="All" showIcon="true" actions="{path:'localCommentModel>Actions', templateShareable: false}">
+						<FeedListItemAction text="{localCommentModel>Text}" icon="{localCommentModel>Icon}" key="{localCommentModel>Key}" press="onActionPressed" />
+					</FeedListItem>
+				</List>
+			</VBox>
+		</content>
+
+		<endButton>
+			<Button text="Close" type="Transparent" press="onCloseComments" />
+		</endButton>
+	</Dialog>
+
+</core:FragmentDefinition>

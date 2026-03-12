@@ -37,6 +37,7 @@ sap.ui.define(
       _onRouteMatched: function (oEvent) {
         var sReqid = oEvent.getParameter("arguments").Reqid;
         var reqStatus = oEvent.getParameter("arguments").req_status;
+        let oModel = this.getView().getModel();
         this.reqid = sReqid;
         this.RequestStatus = reqStatus;
         if (this.RequestStatus == "Process Not Started") {
@@ -50,21 +51,22 @@ sap.ui.define(
           this.getView().byId("onErrorButton").setVisible(false);
         }
         this.getView().byId("idRequest").setText(`Request Id : ${this.reqid}`);
-        this.getView().byId("smartErrorChart").rebindChart();
-        this.getView().byId("smartErrorTable").rebindTable();
-        let oModel = this.getView().getModel();
+        oModel.metadataLoaded().then(function () {
+          this.getView().byId("smartErrorChart")?.rebindChart();
+          this.getView().byId("smartErrorTable")?.rebindTable();
+        })
         oModel.read("/ZP_QU_DG_SMROOT", {
           filters: [new sap.ui.model.Filter("reqid", "EQ", this.reqid)],
           success: function (res) {
             debugger;
             this.Daftdata = this.findDuplicatesBySNoAndMatnr(res.results)
             this._buttonControll();
+            this.checkWorkItemRequests();
           }.bind(this),
           error: function (err) {
             console.log(err);
           }.bind(this)
         });
-        this.checkWorkItemRequests();
       },
 
       _ReadErrorData: function () {
@@ -235,7 +237,6 @@ sap.ui.define(
         });
       },
 
-
       onBeforeRebindTable: function (oEvent) {
 
         let that = this;
@@ -247,9 +248,12 @@ sap.ui.define(
           );
         }
 
+        oBindingParams.filters.push(
+          new sap.ui.model.Filter("mass_upld_error", sap.ui.model.FilterOperator.EQ, false)
+        );
+
         // Add filter for active entities
         oBindingParams.filters.push(new sap.ui.model.Filter("IsActiveEntity", "EQ", true));
-
 
         // Add error filter if it exists
         if (this.oErrorFilter) {
@@ -625,6 +629,7 @@ sap.ui.define(
       },
       onApprove: function () {
         debugger;
+        sap.ui.core.BusyIndicator.show(0);
         let that = this;
         let oModel = this.getOwnerComponent().getModel();
 
@@ -642,19 +647,39 @@ sap.ui.define(
           method: "POST",
           urlParameters: oParams,
           success: (oData, response) => {
-
             let successMessage = "Request Approved";
-            if (oData && oData.__metadata && oData.__metadata['sap-message']) {
-              const sapMessage = JSON.parse(oData.__metadata['sap-message']);
-              if (sapMessage && sapMessage.message) {
-                successMessage = sapMessage.message;
+            const uniqueMessages = new Set();
+            const extractMessages = (sapMessage) => {
+              if (!sapMessage) return;
+              if (sapMessage.message) {
+                uniqueMessages.add(sapMessage.message);
               }
-            } else if (response && response.headers && response.headers['sap-message']) {
-              const sapMessage = JSON.parse(response.headers['sap-message']);
-              if (sapMessage && sapMessage.message) {
-                successMessage = sapMessage.message;
+              if (sapMessage.details && Array.isArray(sapMessage.details)) {
+                sapMessage.details.forEach((detail) => {
+                  if (detail.message) {
+                    uniqueMessages.add(detail.message);
+                  }
+                });
               }
+            };
+
+            // Case 1: Message inside metadata
+            if (oData && oData.__metadata && oData.__metadata["sap-message"]) {
+              const sapMessage = JSON.parse(oData.__metadata["sap-message"]);
+              extractMessages(sapMessage);
             }
+
+            // Case 2: Message inside response header
+            else if (response && response.headers && response.headers["sap-message"]) {
+              const sapMessage = JSON.parse(response.headers["sap-message"]);
+              extractMessages(sapMessage);
+            }
+
+            // Convert Set → string
+            if (uniqueMessages.size > 0) {
+              successMessage = Array.from(uniqueMessages).join("\n\n");
+            }
+            sap.ui.core.BusyIndicator.hide();
 
             sap.m.MessageBox.show(successMessage, {
               icon: sap.m.MessageBox.Icon.SUCCESS,
@@ -669,6 +694,7 @@ sap.ui.define(
             });
           },
           error: (oError) => {
+            sap.ui.core.BusyIndicator.hide();
             sap.m.MessageToast.show("Approval failed");
             console.log("Approve error", oError);
           }

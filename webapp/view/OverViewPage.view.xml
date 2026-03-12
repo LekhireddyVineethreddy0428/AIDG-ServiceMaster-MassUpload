@@ -100,6 +100,7 @@
                     <OverflowToolbar>
                         <ToolbarSpacer />
                         <ToolbarSpacer />
+                         <Button text="Comments"  press="onPressComments" type="Emphasized" visible="true" id="CommentsBtn"/>
                         <Button text="Show Logs" press="onShowLog" type="Emphasized" visible="{controllModel>/ShowLogBtn}" id="logsButton" />
                         <Button text="Show Status" press="onShowStatus" type="Emphasized" visible="{controllModel>/ShowLogBtn}" id="statusButton" />
                         <Button text="Withdraw" press="onWithdraw" type="Emphasized" visible="{controllModel>/WithdrawBtn}" id="WithdrawButton" />

@@ -198,6 +198,8 @@ sap.ui.define(
             } else {
               that.WorkItem_ID = oData.results[0].WorkItem_ID;
               that._ProcessId = oData.results[0].process_id;
+              that._TopLevelWiid = oData.results[0].TopLevelWorkflowTask;
+              that._Sequence = oData.results[0].sequence;
             }
             if (oData.results && oData.results.length > 0 && oData.results[0].WorkItem_ID) {
               that.getView().byId("onEdit").setProperty("visible", false);
@@ -250,7 +252,16 @@ sap.ui.define(
         // Add filter for active entities
         oBindingParams.filters.push(new sap.ui.model.Filter("IsActiveEntity", "EQ", true));
 
-
+        // Add Filter after workflow started 
+        if ((this.WorkItem_ID?.length ?? 0) > 1) {
+          oBindingParams.filters.push(
+            new sap.ui.model.Filter(
+              "mass_upld_error",
+              sap.ui.model.FilterOperator.EQ,
+              false
+            )
+          );
+        }
         // Add error filter if it exists
         if (this.oErrorFilter) {
           oBindingParams.filters.push(this.oErrorFilter);
@@ -509,41 +520,86 @@ sap.ui.define(
           }.bind(this),
         });
       },
-      onPressProceedWihoutError: async function (oEvent) {
+      onPressProceedWihoutError: async function () {
         try {
-          let that = this;
-          debugger;
-          // console.log("clicked");
+          const that = this;
           const oModel = this.getOwnerComponent().getModel();
-          const firstValidRecord = this._UploadedData.find(item => item.mass_upld_error === false);
+
+          const firstValidRecord = this._UploadedData.find(
+            item => item.mass_upld_error === false
+          );
+
           if (!firstValidRecord) {
             MessageToast.show("No Valid Records found to proceed..!!!");
             return;
           }
+
           this.getView().setBusy(true);
 
-          // First call - ignore_error
-          await new Promise((resolve, reject) => {
+          // 1️ First Call - ignore_error (DiscardDraft: false)
+
+          const ignoreResponse = await new Promise((resolve, reject) => {
             oModel.callFunction("/ignore_error", {
               method: "POST",
               urlParameters: {
                 s_no: 1,
                 reqid: this.reqid,
-                asnum: '',
-                IsActiveEntity: true
+                asnum: "",
+                IsActiveEntity: true,
+                DiscardDraft: false
               },
-              success: function (oData, response) {
-                MessageToast.show("Errors disregarded successfully..!!");
-
-                resolve();
-              },
-              error: function (oError) {
-                reject(oError);
-              }
+              success: resolve,
+              error: reject
             });
           });
 
-          // Second call - initiate_workflow (only after first call succeeds)
+          // 2️ If Draft Exists
+
+          if (ignoreResponse.ignore_error.IsDraftPresent === true) {
+
+            const userConfirmed = await new Promise((res) => {
+              MessageBox.warning(
+                "Draft records already exist. Are you sure you want to proceed?",
+                {
+                  title: "Warning",
+                  actions: [
+                    MessageBox.Action.YES,
+                    MessageBox.Action.NO
+                  ],
+                  emphasizedAction: MessageBox.Action.YES,
+                  onClose: function (oAction) {
+                    res(oAction === MessageBox.Action.YES);
+                  }
+                }
+              );
+            });
+
+            //  If NO → stop execution
+            if (!userConfirmed) {
+              return;
+            }
+
+            //  If YES → Call ignore_error again with DiscardDraft: true
+            await new Promise((resolve, reject) => {
+              oModel.callFunction("/ignore_error", {
+                method: "POST",
+                urlParameters: {
+                  s_no: 1,
+                  reqid: this.reqid,
+                  asnum: "",
+                  IsActiveEntity: true,
+                  DiscardDraft: true
+                },
+                success: resolve,
+                error: reject
+              });
+            });
+          }
+
+          MessageToast.show("Errors disregarded successfully..!!");
+
+          // 3️ Call initiate_workflow
+
           await new Promise((resolve, reject) => {
             oModel.callFunction("/initiate_workflow", {
               method: "POST",
@@ -551,27 +607,30 @@ sap.ui.define(
                 s_no: 1,
                 reqid: this.reqid,
                 asnum: "",
-                IsActiveEntity: true,
+                IsActiveEntity: true
               },
-              success: function (oData, response) {
-                MessageBox.success(`Workflow initiated successfully...!!!`, {
-                  onClose: () => {
-                    that.getOwnerComponent().getRouter().navTo("View1");
-                    resolve();
+              success: function () {
+                MessageBox.success(
+                  "Workflow initiated successfully...!!!",
+                  {
+                    onClose: function () {
+                      that.getOwnerComponent()
+                        .getRouter()
+                        .navTo("View1");
+                      resolve();
+                    }
                   }
-                });
+                );
               },
-              error: function (oError) {
-                reject(oError);
-              }
+              error: reject
             });
           });
 
-          // After both calls complete successfully
+          // Refresh error data
           this._ReadErrorData();
 
         } catch (oError) {
-          MessageToast.show("Something went wrong...!!!", oError);
+          MessageToast.show("Something went wrong...!!!");
         } finally {
           this.getView().setBusy(false);
         }
@@ -582,7 +641,7 @@ sap.ui.define(
         let that = this;
         sap.m.MessageBox.confirm("Are you sure you want to Withdraw the request?", {
           icon: sap.m.MessageBox.Icon.WARNING,
-          title: "",
+          title: "Withdraw Request",
           onClose: function (oAction) {
             if (oAction === sap.m.MessageBox.Action.OK) {
               that.getView().setBusy(true);
@@ -590,8 +649,8 @@ sap.ui.define(
               let oPayload = {
                 s_no: 1,
                 reqid: that.reqid,
-                asnum: that.asnum,
-                IsActiveEntity: that.activeEnity,
+                asnum: '',
+                IsActiveEntity: true,
                 WiId: that.WorkItem_ID,
                 Step: ''
               };
@@ -634,7 +693,6 @@ sap.ui.define(
 
         });
       },
-
 
       onPressCancel: function () {
         // Navigate to the main page
@@ -1028,7 +1086,358 @@ sap.ui.define(
         if (text === 'PENDING') {
           return 'myDisabledNode'
         }
-      }
+      },
+
+
+      //___________________________COMMENTS_________________________
+
+      onPressComments: function (oEvent) {
+        const sTopLevelWorkItemID = this._TopLevelWiid;
+        this._openCommentsDialog();
+        this._GetComments(sTopLevelWorkItemID);
+      },
+
+      _openCommentsDialog: function (sTopLevelWorkItemID) {
+        if (!this.CommentsFragment) {
+          this.CommentsFragment = sap.ui.xmlfragment(
+            "zaidgsmmsup.fragments.Comments",
+            this
+          );
+          this.getView().addDependent(this.CommentsFragment);
+        }
+
+        this.CommentsFragment.open();
+      },
+
+      // ─── CLOSE HANDLER ───
+      onCloseComments: function () {
+        this.CommentsFragment.close();
+      },
+
+      onPost: function (oEvent) {
+        let oCommentLayout = sap.ui.getCore().byId('commentsDialog');
+        oCommentLayout.setBusy(true);
+
+        let oModel = this.getOwnerComponent().getModel();
+        const sCommentText = oEvent.getParameter("value");
+
+        const oNewComment = {
+          Id: "",
+          Filename: "USER COMMENTS",
+          CreatedAt: new Date(),
+          CreatedBy: '',
+          Text: sCommentText,
+          InstanceId: "",
+          Delete: "X"
+        };
+
+        // Fetch existing comments first, then merge with new one
+        oModel.read("/ZP_QU_DG_SMROOT", {
+          filters: [new sap.ui.model.Filter("reqid", "EQ", this.reqid)],
+          success: function (res) {
+            const sExistingComments = res.results[0]?.user_comment;
+            const aExistingComments = sExistingComments ? [JSON.parse(sExistingComments)].flat() : [];
+
+            // Merge existing + new comment
+            const aMergedComments = [...aExistingComments, oNewComment];
+
+            const oPayload = {
+              s_no: 1,
+              asnum: 'TMP_SM_1',
+              reqid: this.reqid,
+              IsActiveEntity: true,
+              user_comment: JSON.stringify(aMergedComments)
+            };
+
+            oModel.callFunction('/post_comments_mass', {
+              method: "POST",
+              urlParameters: oPayload,
+              success: function (oResponse) {
+                oCommentLayout.setBusy(false);
+                this._GetComments();
+              }.bind(this),
+              error: function (oError) {
+                oCommentLayout.setBusy(false);
+                sap.m.MessageToast.show('Failed to post comments');
+              }
+            });
+          }.bind(this),
+          error: function (oError) {
+            oCommentLayout.setBusy(false);
+            sap.m.MessageToast.show('Failed to fetch existing comments');
+          }
+        });
+      },
+
+      onActionPressed: function (oEvent) {
+        let sAction = oEvent.getSource().getKey();
+        let oCommentModel = this.getOwnerComponent().getModel('ZQU_DG_ATTACHMENT_COMMENT_SRV');
+        let commentData = oEvent.getSource().getParent().getBindingContext('localCommentModel').getObject();
+
+        if (sAction === "DELETE") {
+
+          // IF THE COMMENT IS STORED IN THE "user_comment" PROPERTY (no InstanceId)
+          if (!commentData.InstanceId) {
+            let oModel = this.getOwnerComponent().getModel();
+            let oCommentLayout = sap.ui.getCore().byId('commentsDialog');
+            oCommentLayout.setBusy(true);
+
+            // Fetch existing comments from backend
+            oModel.read("/ZP_QU_DG_SMROOT", {
+              filters: [new sap.ui.model.Filter("reqid", "EQ", this.reqid)],
+              success: function (res) {
+                const sExistingComments = res.results[0]?.user_comment;
+                const aExistingComments = sExistingComments ? [JSON.parse(sExistingComments)].flat() : [];
+
+                // Filter out the deleted comment by matching CreatedAt
+                const aFilteredComments = aExistingComments.filter(
+                  (item) => item.CreatedAt !== commentData.CreatedAt
+                );
+
+                const oPayload = {
+                  s_no: 1,
+                  asnum: 'TMP_SM_1',
+                  reqid: this.reqid,
+                  IsActiveEntity: true,
+                  user_comment: JSON.stringify(aFilteredComments)
+                };
+
+                // Send updated list (without deleted comment) to backend
+                oModel.callFunction('/post_comments_mass', {
+                  method: "POST",
+                  urlParameters: oPayload,
+                  success: function () {
+                    oCommentLayout.setBusy(false);
+                    sap.m.MessageToast.show("Comment Deleted");
+                    this._GetComments();
+                  }.bind(this),
+                  error: function () {
+                    oCommentLayout.setBusy(false);
+                    sap.m.MessageToast.show("Failed to delete comment");
+                  }
+                });
+              }.bind(this),
+              error: function () {
+                oCommentLayout.setBusy(false);
+                sap.m.MessageToast.show("Failed to fetch comments");
+              }
+            });
+
+          } else {
+            // COMMENT IS STORED IN BACKEND CommentSet (has InstanceId)
+            oCommentModel.remove("/CommentSet(InstanceId='" + commentData.InstanceId + "',Id='" + commentData.Id + "')", {
+              success: function () {
+                sap.m.MessageToast.show('Comment Deleted..!!');
+                this._GetComments(commentData.InstanceId);
+              }.bind(this),
+              error: function () {
+                sap.m.MessageToast.show('Something went wrong..!!');
+              }
+            });
+          }
+        }
+      },
+      _GetComments: async function (TopLevelWorkItemId) {
+        let oCommentLayout = sap.ui.getCore().byId('commentsDialog');
+        oCommentLayout.setBusy(true);
+
+        let aAllCommentsList = [];
+
+        try {
+          // Get comments from local context
+          let mainModel = this.getOwnerComponent().getModel();
+          let localComments = await new Promise((resolve, reject) => {
+            mainModel.read("/ZP_QU_DG_SMROOT", {
+              filters: [new sap.ui.model.Filter("reqid", "EQ", this.reqid)],
+              success: function (res) {
+                const sComment = res.results[0]?.user_comment;
+                resolve(sComment ? [JSON.parse(sComment)].flat() : []);
+              }.bind(this),
+              error: function (err) {
+                reject(err);
+              }.bind(this)
+            });
+          });
+
+          aAllCommentsList = localComments;
+
+          // Only fetch backend comments if no local comments found
+          if (!localComments || localComments.length === 0) {
+            let oCommentModel = this.getOwnerComponent().getModel('ZQU_DG_ATTACHMENT_COMMENT_SRV');
+            let backendComments = await new Promise((resolve, reject) => {
+              oCommentModel.read("/TaskSet('" + TopLevelWorkItemId + "')/TaskToComments", {
+                success: function (oData) {
+                  resolve(oData.results);
+                },
+                error: function (oError) {
+                  reject(oError);
+                }
+              });
+            });
+
+            aAllCommentsList = backendComments;
+          }
+
+          this._SetCommentsModel(aAllCommentsList);
+
+        } catch (error) {
+          console.log("Error fetching comments:", error);
+        } finally {
+          oCommentLayout.setBusy(false);
+        }
+      },
+      _SetCommentsModel: function (aComments) {
+        if (aComments.length > 0) {
+          let aActions = [{
+            "Text": "Delete",
+            "Icon": "sap-icon://delete",
+            "Key": "DELETE"
+          }];
+
+          for (var count = 0; count < aComments.length; count++) {
+            if (aComments[count].Delete === "X") {
+              aComments[count].Actions = aActions;
+            }
+            else {
+              aComments[count].Actions = [];
+            }
+
+          }
+        }
+        let localModel = new sap.ui.model.json.JSONModel();
+        localModel.setData({ "EntryCollection": aComments });
+        this.getView().setModel(localModel, "localCommentModel");
+      },
+      dateFormatterForComments: function (sDate) {
+        let oDate = new Date(sDate)
+        let oDateInstance = DateFormat.getDateInstance({
+          pattern: "dd-MMM-yyyy"
+        })
+
+        return oDateInstance.format(oDate)
+      },
+
+      //______________Attachments________________
+      onPressAttachments: function (oEvent) {
+        debugger
+        this._openAttachmentssDialog();
+        this.ActtivityNum = oEvent.getSource().getModel("selData").getData().asnum;
+      },
+      _openAttachmentssDialog: function () {
+        if (!this.AttachmentsFragment) {
+          this.AttachmentsFragment = sap.ui.xmlfragment(
+            "zaidgsmmsup.fragments.Attachments",
+            this
+          );
+          this.getView().addDependent(this.AttachmentsFragment);
+        }
+
+        this.AttachmentsFragment.open();
+        this._getattachment();
+      },
+
+      // ─── CLOSE HANDLER ───
+      onCloseAttachments: function () {
+        this.AttachmentsFragment.close();
+      },
+      onBeforeUploadStarts: function (oEvent) {
+        let oUploadSet = sap.ui.getCore().byId("idUploadSet");
+        let sTokenForUpload = this.getOwnerComponent().getModel("CV_ATTACHMENT_SRV").getSecurityToken()
+        let oUploadItem = oEvent.getParameter('item')
+        let sFileName = oUploadItem.getProperty("fileName");
+        let sReqid = this.reqid
+        let asnum = this.ActtivityNum
+        //HEADER PARAMETERS
+        oUploadSet.addHeaderField(new sap.ui.core.Item({
+          key: "X-CSRF-Token",
+          text: sTokenForUpload
+        }))
+
+        oUploadSet.addHeaderField(new sap.ui.core.Item({
+          key: "objectkey",
+          text: btoa(`${sReqid}${asnum}`)
+        }))
+        oUploadSet.addHeaderField(new sap.ui.core.Item({
+          key: "objecttype",
+          text: "BUS1006"
+        }))
+        oUploadSet.addHeaderField(new sap.ui.core.Item({
+          key: "slug",
+          text: btoa(sFileName)
+        }))
+      },
+      onUploadCompleted: function (oEvent) {
+        //Remove added headers
+        let oUploadSet = sap.ui.getCore().byId("idUploadSet");
+        oUploadSet.removeAllHeaderFields();
+        let oResponse = oEvent.getParameters("response");
+        if (oResponse.status === 201) {
+          this._getattachment()
+          sap.m.MessageToast.show("File uploaded successfully")
+        } else {
+          MessageBox.error(
+            `
+                SOMETHING WENT WRONG \n
+                Status:${oResponse.status} \n
+                Response:${oResponse.responseRaw}`
+          )
+        }
+      },
+      onDeleteAttachment: function (oEvent) {
+        oEvent.preventDefault();
+        let oSelectedItemData = oEvent.getParameter('item').getBindingContext('attachmentDetail').getObject()
+        let oModel = this.getOwnerComponent().getModel("CV_ATTACHMENT_SRV");
+        let sPath = oSelectedItemData.__metadata.uri.split('/CV_ATTACHMENT_SRV')[1];
+        let sReqid = this.reqid
+        let asnum = this.ActtivityNum
+        let key = sReqid + asnum
+
+        MessageBox.confirm("Are you sure you want to delete this file?", {
+          title: "Confirm Deletion",
+          actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+          onClose: function (oAction) {
+            if (oAction === MessageBox.Action.YES) {
+              oModel.remove(sPath, {
+                headers: {
+                  "objectkey": btoa(key),
+                  "objecttype": "BUS1006"
+                },
+                success: function () {
+                  this._getattachment();
+                  sap.m.MessageToast.show("File deleted successfully");
+                }.bind(this),
+                error: function (oErr) {
+                  let sErrMsg = JSON.parse(oErr.responseText).error.message.value;
+                  sap.m.MessageBox.error(sErrMsg);
+                }
+              });
+            }
+          }.bind(this)
+        });
+      },
+      _getattachment: function () {
+        debugger;
+        let oModel = this.getOwnerComponent().getModel("CV_ATTACHMENT_SRV");
+        let sReqid = this.reqid
+        let asnum = this.ActtivityNum
+        oModel.read("/GetAllOriginals", {
+          urlParameters: {
+            "ObjectType": "'BUS1006'",
+            "ObjectKey": `'${sReqid}${asnum}'`,
+            "SemanticObjectType": "''",
+            "IsDraft": false,
+            "AttachmentFramework": "''"
+          },
+          success: function (oData, oRes) {
+            debugger
+            this.getView().setModel(new sap.ui.model.json.JSONModel(oData.results), "attachmentDetail");
+          }.bind(this),
+          error: function (oErr) {
+            debugger
+            console.log(oErr);
+          }
+        });
+      },
 
 
     });
