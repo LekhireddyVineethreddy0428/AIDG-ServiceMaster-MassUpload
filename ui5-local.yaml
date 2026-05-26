@@ -32,16 +32,16 @@ server:
         backend:
           - path: /sap
             url: http://airdithanaprd:44388
-            destination: s4p_https
+            destination: AIRDIT_HANA_VSH
           - url: http://airdithanaprd:44388
-            client: '200'
+            client: '400'
             authenticationType: BasicAuthentication
-            destination: s4p_https
+            destination: AIRDIT_HANA_VSH
             path: /sap/opu/odata/sap/ZP_QU_DG_WORKITM_RQSTS_SRV/
           - url: http://airdithanaprd:44388
-            client: '200'
+            client: '400'
             authenticationType: BasicAuthentication
-            destination: s4p_https
+            destination: AIRDIT_HANA_VSH
             path: /sap/opu/odata/sap/ZC_QU_DG_SM_MASS_SRV/
     - name: sap-fe-mockserver
       beforeMiddleware: csp

@@ -4,14 +4,14 @@
 >
     <Menu>
         <MenuItem
-            text="New Mass Upload"
+            text="Mass Upload"
             icon="sap-icon://upload"
-            press="onUploadpress"
+            press="onMassUploadpress"
         />
         <MenuItem
-            text="Extend Mass Upload"
+            text="Mass Update"
             icon="sap-icon://detail-more"
-            press="onMassExtendPress"
+            press="onMassUpdatePress"
         />
     </Menu>
 </core:FragmentDefinition>

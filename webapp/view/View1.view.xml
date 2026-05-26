@@ -40,7 +40,7 @@
                             <smartTable:customToolbar>
                                 <OverflowToolbar id="_IDGenOverflowToolbar1" design="Transparent">
                                     <ToolbarSpacer id="_IDGenToolbarSpacer" />
-                                    <Button id="idCreate"  text="Mass Upload" icon="sap-icon://write-new" type="Transparent" press="onUploadpress" />
+                                    <Button id="idCreate"  text="Mass Operations" icon="sap-icon://write-new" type="Transparent" press="onUploadpress" />
                                 </OverflowToolbar>
                             </smartTable:customToolbar>
                             <Table sticky="ColumnHeaders,HeaderToolbar,InfoToolbar" />
@@ -58,7 +58,7 @@
                                     <m:Button id="MassUploadExcel" text="Export Excel" type="Transparent" press="onPressExport" icon="sap-icon://excel-attachment" />
                                 </m:OverflowToolbar>
                             </smartTable:customToolbar>
-                            <m:Table sticky="ColumnHeaders,HeaderToolbar,InfoToolbar" />
+                            <m:Table sticky="ColumnHeaders,HeaderToolbar,InfoToolbar" mode="MultiSelect" />
                         </smartTable:SmartTable>
                     </IconTabFilter>
                 </items>

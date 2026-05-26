@@ -439,7 +439,7 @@ sap.ui.define(
           SNO: 1,
           REQID: this.reqid,
           MATNR: rowData.asnum,
-          ISACTIVEENTITY: false
+          ISACTIVEENTITY: true
         }
 
         let oPayload = {
@@ -453,9 +453,11 @@ sap.ui.define(
           sRoute: "OverViewPage",
           Reqid: this.reqid,
         };
+        debugger;
 
 
         if (this.Daftdata && this.Daftdata.includes(rowData.asnum)) {
+          debugger;
           sap.ui.getCore().backNavigationFromServiceToMassUpload = currentpage;
           sap.ui.getCore().navigateExternal(sComponent, '', { params: oParamsDraft });
         } else {
@@ -472,9 +474,14 @@ sap.ui.define(
               try {
                 const errorData = JSON.parse(oErr.responseText);
                 const errorMessage = errorData.error?.message?.value || "An unknown error occurred.";
-                sap.m.MessageBox.error(errorMessage, { title: "Error" });
+                if (errorMessage == "Edit not possible: draft already exists.") {
+                  sap.ui.getCore().backNavigationFromServiceToMassUpload = currentpage;
+                  sap.ui.getCore().navigateExternal(sComponent, '', { params: oParamsDraft });
+                } else {
+                  sap.m.MessageBox.error(errorMessage, { title: "Error" });
+                }
               } catch {
-                sap.m.MessageBox.error("Failed to process the error. Please try again.", { title: "Error" });
+               // sap.m.MessageBox.error("Failed to process the error. Please try again.", { title: "Error" });
               }
             }
           })

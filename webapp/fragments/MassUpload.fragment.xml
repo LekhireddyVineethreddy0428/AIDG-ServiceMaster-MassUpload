@@ -1,0 +1,25 @@
+<core:FragmentDefinition xmlns:smartfield="sap.ui.comp.smartfield"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:unified="sap.ui.unified">
+    <Dialog id="requestDialog" title="Mass Upload" type="Message" contentWidth="35%" contentHeight="auto" draggable="false" resizable="true">
+        <content>
+            <VBox class="sapUiSmallMargin" width="90%">
+                <Label  text="Download Template" design="Bold" />
+                <Button  width="100%" text="Download Mass Upload Template" icon="sap-icon://download" press="onClickDownloadTemplate"/>
+                <Label text="Upload File" design="Bold" />
+                <unified:FileUploader id="fileUploader" width="100%" fileType="xlsx" sendXHR="true" name="myFileUpload" buttonText="Browse" useMultipart="false" placeholder="Choose a file..." tooltip="Upload your file to the local server" uploadComplete="handleUploadComplete"/>
+                <Label text="Request Priority" labelFor="requestPriorityInput" class="sapUiSmallMarginTop" design="Bold" />
+                <Input id="requestPriorityInput" placeholder="Select priority..." width="100%" showValueHelp="true" valueHelpRequest="onValueHelpRequested" required="true" change=".onPriorityChange" enableSuggestionsHighlighting="true" />
+                <Label text="Request Description" labelFor="requestDescriptionInput" design="Bold" />
+                <Input id="requestDescriptionInput" placeholder="Enter description..." width="100%" required="true" />
+            </VBox>
+        </content>
+        <beginButton>
+            <Button text="Submit" type="Accept" press="onSubmitExcel" />
+        </beginButton>
+        <endButton>
+            <Button text="Cancel" type="Reject" press="onCancelFrag" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
